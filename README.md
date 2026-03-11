@@ -6,3 +6,9 @@
 ### server listen port : 3000
 
 ### server listen http:localhost:3000
+
+
+# Router setup 
+### base url: "localhost:3000/api/v1"
+
+
