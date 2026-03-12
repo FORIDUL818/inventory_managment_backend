@@ -11,4 +11,9 @@
 # Router setup 
 ### base url: "localhost:3000/api/v1"
 
+## database connection use mongoose 
+
+### link :
+### mongodb://localhost:27017/inventory_db
+
 
