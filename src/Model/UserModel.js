@@ -1,31 +1,16 @@
 const mongoose = require('mongoose');
-const { use } = require('react');
+
 
 const userSchema = new mongoose.Schema({
-    username: { type: String, required: true, },
+    username: { type: String, required: true, }, 
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'user', 'manager','guest','moderator',  'editor','contributor','subscriber','member','visitor ','client','customer','partner','vendor','employee','staff','supervisor','director','executive'],
+    role: { type: String, enum: ['admin', 'user', ],
          default: 'user'
 
      },
     createdAt: { type: Date, default: Date.now }
-});
+},{versionKey: false,timestamps: true});
 
-module.exports = mongoose.model('User', userSchema);
-userSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) {
-        return next();
-    }   
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (error) {
-        next(error);
-    }
-});
-
-userSchema.methods.comparePassword = async function (candidatePassword) {
-    return await bcrypt.compare(candidatePassword, this.password);
-};
+const userModel = mongoose.model('Users', userSchema);
+module.exports = userModel;

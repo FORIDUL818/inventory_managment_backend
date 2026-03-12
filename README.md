@@ -9,11 +9,15 @@
 
 
 # Router setup 
-### base url: "localhost:3000/api/v1"
+### base url: "http://localhost:3000/api/v1"
 
 ## database connection use mongoose 
 
 ### link :
 ### mongodb://localhost:27017/inventory_db
 
+## user userschima and Model  creation using mongoose 
+
+##  user created system ready 
+### using system api Post link:  "http://localhost:3000/api/v1/register" 
 
