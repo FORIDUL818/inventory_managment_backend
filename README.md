@@ -1,23 +1,23 @@
 # Inventory Management Backend
 
-A Node.js/Express REST API backend for an Inventory Management System with user authentication.
+A robust Node.js Express backend API for inventory management system with user authentication, built using MongoDB, JWT, and bcrypt.
 
 ## Features
 
-- User Registration with role-based access (admin/user)
-- RESTful API architecture
-- MongoDB database integration using Mongoose
-- JWT-based authentication ready
-- Password hashing with bcrypt
-- CORS enabled for cross-origin requests
-- Input validation and error handling
+- **User Authentication**: Secure registration and login with JWT tokens
+- **Password Security**: Password hashing using bcrypt
+- **User Profile Management**: Get and update user profiles
+- **Role-based Access**: Support for multiple user roles (admin, user, manager, staff, etc.)
+- **RESTful API**: Clean and consistent API endpoints
+- **MongoDB Integration**: Flexible database with Mongoose ODM
+- **CORS Support**: Cross-origin resource sharing enabled
 
 ## Tech Stack
 
 - **Runtime**: Node.js
 - **Framework**: Express.js
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JSON Web Token (JWT)
+- **Database**: MongoDB with Mongoose
+- **Authentication**: JWT (JSON Web Tokens)
 - **Password Hashing**: bcrypt
 - **Environment Variables**: dotenv
 
@@ -27,236 +27,233 @@ A Node.js/Express REST API backend for an Inventory Management System with user 
 backend/
 ├── src/
 │   ├── Controllers/
-│   │   └── UserController.js     # User registration & login logic
-│   ├── Middleware/
-│   │   └── authMiddleware.js     # JWT authentication middleware
-│   ├── Util/
-│   │   └── jwtUtils.js           # JWT token generation & verification
+│   │   └── UserController.js    # User business logic
 │   ├── db/
-│   │   └── db.js                 # MongoDB connection
+│   │   └── db.js               # MongoDB connection
+│   ├── Middleware/
+│   │   └── authMiddleware.js   # JWT authentication middleware
 │   ├── Model/
-│   │   └── UserModel.js          # Mongoose user schema
+│   │   └── UserModel.js        # Mongoose user schema
 │   ├── Routes/
-│   │   └── AuthRoutes.js         # Authentication routes
-├── app.js                        # Express app configuration
-├── index.js                      # Application entry point
-├── package.json                  # Dependencies
-├── .env                          # Environment variables
-└── README.md                     # Project documentation
+│   │   └── AuthRoutes.js       # Authentication routes
+│   └── Util/
+│       └── jwtUtils.js         # JWT utility functions
+├── .env                         # Environment variables
+├── .gitignore                   # Git ignore file
+├── app.js                       # Express app configuration
+├── index.js                     # Application entry point
+├── package.json                 # Dependencies and scripts
+└── README.md                    # Project documentation
 ```
 
 ## Installation
 
-1. Clone the repository
-2. Install dependencies:
+1. **Clone the repository**
+
+   ```bash
+   cd your-project-directory
+   ```
+
+2. **Install dependencies**
 
    ```bash
    npm install
    ```
 
-3. Create a `.env` file in the root directory:
+3. **Set up environment variables**
+
+   Create a `.env` file in the root directory with the following variables:
 
    ```env
    PORT=3000
    MONGO_URI=mongodb://localhost:27017/inventory_db
-   JWT_SECRET=your_jwt_secret_key
+   JWT_SECRET=your_secret_key_here
    ```
 
-4. Start MongoDB locally or use MongoDB Atlas
+4. **Start MongoDB**
 
-## Environment Variables
+   Make sure MongoDB is running locally or update the `MONGO_URI` to point to your MongoDB instance.
 
-| Variable   | Description                         | Default                                |
-| ---------- | ----------------------------------- | -------------------------------------- |
-| PORT       | Server port number                  | 3000                                   |
-| MONGO_URI  | MongoDB connection string           | mongodb://localhost:27017/inventory_db |
-| JWT_SECRET | Secret key for JWT token generation | -                                      |
+5. **Run the application**
+   - Development mode (with auto-restart):
+     ```bash
+     npm run dev
+     ```
+   - Production mode:
+     ```bash
+     npm start
+     ```
 
-## Available Scripts
+6. **Verify server is running**
 
-| Script        | Description                               |
-| ------------- | ----------------------------------------- |
-| `npm start`   | Start the production server               |
-| `npm run dev` | Start the development server with nodemon |
+   The server will start on `http://localhost:3000` (or the port specified in .env)
 
 ## API Endpoints
 
-### Authentication
+### Authentication Routes (`/api/auth`)
 
-| Method | Endpoint             | Description              | Auth Required |
-| ------ | -------------------- | ------------------------ | ------------- |
-| POST   | `/api/auth/register` | Register a new user      | No            |
-| POST   | `/api/auth/login`    | User login (returns JWT) | No            |
-| GET    | `/api/auth/me`       | Get current user profile | Yes           |
+| Method | Endpoint                   | Description              | Protected |
+| ------ | -------------------------- | ------------------------ | --------- |
+| POST   | `/api/auth/register`       | Register a new user      | No        |
+| POST   | `/api/auth/login`          | Login user and get JWT   | No        |
+| GET    | `/api/auth/profile`        | Get current user profile | Yes       |
+| POST   | `/api/auth/profile_update` | Update user profile      | Yes       |
 
-### Request Body (Register)
+### API Request/Response Examples
 
-```json
+#### Register User
+
+```bash
+POST /api/auth/register
+Content-Type: application/json
+
 {
-  "username": "string (required)",
-  "email": "string (required, unique)",
-  "password": "string (required)",
-  "role": "string (admin/user, default: user)"
+  "FirstName": "John",
+  "LastName": "Doe",
+  "email": "john.doe@example.com",
+  "password": "password123",
+  "role": "user"
 }
 ```
 
-### Response (Success - 201)
+**Response (201):**
 
 ```json
 {
   "message": "User registered successfully",
   "user": {
-    "username": "string",
-    "email": "string",
-    "role": "string",
-    "createdAt": "date"
+    "FirstName": "John",
+    "LastName": "Doe",
+    "email": "john.doe@example.com",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
   }
 }
 ```
 
-### Request Body (Login)
+#### Login User
 
-```json
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
 {
-  "email": "string (required)",
-  "password": "string (required)"
+  "email": "john.doe@example.com",
+  "password": "password123"
 }
 ```
 
-### Response (Login Success - 200)
+**Response (200):**
 
 ```json
 {
   "message": "User logged in successfully",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "id": "string",
-    "username": "string",
-    "email": "string",
-    "role": "string",
-    "createdAt": "date"
+  "userdata": {
+    "FirstName": "John",
+    "LastName": "Doe",
+    "email": "john.doe@example.com",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+#### Get Profile (Protected)
+
+```bash
+GET /api/auth/profile
+Headers:
+  token: <your_jwt_token>
+```
+
+**Response (200):**
+
+```json
+{
+  "data": {
+    "FirstName": "John",
+    "LastName": "Doe",
+    "email": "john.doe@example.com",
+    "role": "user",
+    "isActive": true,
+    "createdAt": "2024-01-01T00:00:00.000Z"
   }
 }
 ```
 
-> ℹ️ **Note**: Save the `token` value to use in subsequent authenticated requests.
-
-### Error Responses
-
-| Status Code | Description                                   |
-| ----------- | --------------------------------------------- |
-| 400         | Bad Request - Invalid input or missing fields |
-| 500         | Internal Server Error                         |
-
-## Server Information
-
-- **Base URL**: `http://localhost:3000`
-- **API Base**: `http://localhost:3000/api/auth`
-
-## Database
-
-- **MongoDB URI**: `mongodb://localhost:27017/inventory_db`
-
-## User Schema
-
-| Field     | Type   | Description                                     |
-| --------- | ------ | ----------------------------------------------- |
-| username  | String | User's display name (required)                  |
-| email     | String | User's email (required, unique)                 |
-| password  | String | Hashed password (required)                      |
-| role      | String | User role - 'admin' or 'user' (default: 'user') |
-| createdAt | Date   | Account creation timestamp                      |
-
-## Getting Started
-
-1. **Install MongoDB**: Download and install MongoDB Community Server from [mongodb.com](https://www.mongodb.com/download-center/community)
-
-2. **Start MongoDB**: Run `mongod` in your terminal to start the MongoDB server
-
-3. **Configure Environment**: Create a `.env` file with your configuration
-
-4. **Run the Server**:
-   - Production: `npm start`
-   - Development: `npm run dev`
-
-5. **Test the API**: Use Postman or curl to test the registration endpoint
-
-## Example Usage
-
-### Register a new user
+#### Update Profile (Protected)
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "johndoe",
-    "email": "john@example.com",
-    "password": "password123",
-    "role": "user"
-  }'
+POST /api/auth/profile_update
+Headers:
+  token: <your_jwt_token>
+Content-Type: application/json
+
+{
+  "FirstName": "Jane",
+  "LastName": "Smith"
+}
 ```
 
-### Login user
+**Response (200):**
 
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "john@example.com",
-    "password": "password123"
-  }'
+```json
+{
+  "status": "success",
+  "message": "Profile updated successfully"
+}
 ```
 
-### Access Protected Route
+## User Model Schema
 
-```bash
-curl -X GET http://localhost:3000/api/auth/me \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE"
-```
+| Field     | Type    | Required | Description                    |
+| --------- | ------- | -------- | ------------------------------ |
+| FirstName | String  | Yes      | User's first name (3-20 chars) |
+| LastName  | String  | Yes      | User's last name (3-20 chars)  |
+| email     | String  | Yes      | Unique email address           |
+| password  | String  | Yes      | Hashed password (min 6 chars)  |
+| role      | String  | No       | User role (default: "user")    |
+| isActive  | Boolean | No       | Account status (default: true) |
+| createdAt | Date    | Auto     | Creation timestamp             |
 
-## Security Notes
+### Supported Roles
 
-> ⚠️ **Important**: The current implementation stores passwords in plaintext. For production use, implement bcrypt password hashing in the login controller to verify passwords securely.
+`admin`, `user`, `manager`, `staff`, `sales`, `support`, `customer`, `guest`, `editor`, `contributor`, `moderator`, `analyst`, `developer`, `designer`, `tester`, `operator`, `consultant`, `director`, `executive`
 
-## JWT Authentication
+## Error Responses
 
-### How JWT Works
+All endpoints may return the following error responses:
 
-1. **Login**: User provides email and password
-2. **Token Generation**: Server validates credentials and returns a JWT token
-3. **Token Storage**: Client stores the token (localStorage, cookies, etc.)
-4. **Protected Requests**: Client includes token in `Authorization` header
+| Status Code | Description                             |
+| ----------- | --------------------------------------- |
+| 400         | Bad Request - Validation error          |
+| 401         | Unauthorized - Invalid or missing token |
+| 404         | Not Found - User not found              |
+| 500         | Server Error - Internal server error    |
 
-### Using Protected Routes
+## Available Scripts
 
-Include the JWT token in the request header:
+| Script        | Description                           |
+| ------------- | ------------------------------------- |
+| `npm start`   | Start the production server           |
+| `npm run dev` | Start development server with nodemon |
 
-```
-Authorization: Bearer <your_jwt_token>
-```
+## Dependencies
 
-### Token Details
-
-- **Expiration**: 24 hours
-- **Payload Contains**: User ID, email, and role
-- **Secret Key**: Stored in `.env` file as `JWT_SECRET`
-
-## Contributing
-
-- JWT token generation on login for stateless authentication
-- Password hashing verification (bcrypt) for secure login
-- Input validation middleware (e.g., express-validator)
-- Role-based access control middleware
-- Inventory CRUD operations
-- Error logging and monitoring
-- API documentation with Swagger
-- Unit tests
-- Refresh token mechanism
+- **express**: ^5.2.1 - Web framework
+- **mongoose**: ^9.3.0 - MongoDB ODM
+- **bcrypt**: ^6.0.0 - Password hashing
+- **jsonwebtoken**: ^9.0.3 - JWT authentication
+- **cors**: ^2.8.6 - CORS support
+- **dotenv**: ^17.3.1 - Environment variables
 
 ## License
 
-ISC
+ISC License
 
 ## Author
 
-Inventory Management Backend Team
+Your Name Here
