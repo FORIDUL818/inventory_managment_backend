@@ -1,12 +1,10 @@
 const express = require('express');
-const { userRagister, userLogin, getCurrentUser } = require('../Controllers/UserController');
-const { authenticateToken } = require('../Middleware/authMiddleware');
+const { userRagister, userLogin, getCurrentUser, profileUpdate } = require('../Controllers/UserController');
+const userVarify = require('../Middleware/authMiddleware');
 const router = express.Router();
 
 router.post('/register', userRagister); 
 router.post('/login', userLogin);
-
-// Protected route example - requires authentication
-router.get('/me', authenticateToken, getCurrentUser);
-
-module.exports = router;
+router.get("/profile",userVarify,getCurrentUser); 
+router.post("/profile_update",userVarify,profileUpdate); 
+module.exports = router;  
